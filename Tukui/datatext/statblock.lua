@@ -174,7 +174,10 @@ if TukuiCF["datatext"].stat_block == true then
 	TukuiDB.CreatePanel(timestat, 60, TukuiDB.infoheight, "TOPLEFT", latencystat, "TOPLEFT", latencystat:GetWidth() + 3, 0)
 	timestat:EnableMouse(true)
 	timestat:RegisterForClicks("AnyDown")
-
+	
+	EclipseSettings[1] = true
+	EclipseSettings[2] = false
+	EclipseSettings[3] = true
 	local ttext  = timestat:CreateFontString(nil, "OVERLAY")
 	ttext:SetFont(TukuiCF.theme.DATA_Font, TukuiCF.theme.DATA_FSize, TukuiCF.theme.DATA_FFlag)
 	ttext:SetPoint("CENTER")
