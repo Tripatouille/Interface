@@ -159,7 +159,8 @@ TukuiCF["actionbar"] = {
 		["splitbar"] = true,					-- split the third right actionbar into two rows of 3 on the left and right side of the main actionbar
 		["showgrid"] = true,                   -- show grid on empty button
 		["rightbars_vh"] = false,
-		["verticalshapeshift"] = true, -- Orient the shapeshift or totem bar vertically
+		["totem_leftcorner"] = true,			-- Put the totembar in the left high corner, unmoveable! (If True, no matter of verticalshapeshift nor flishapeshift)
+		["verticalshapeshift"] = false, -- Orient the shapeshift or totem bar vertically
 		["flipshapeshift"] = true, -- Expand shapeshift or totem bar down/left instead of up/right
 }
 
@@ -258,7 +259,7 @@ TukuiCF["others"] = {
 	["autoacceptinv"] = true,                 -- auto-accept invite from guildmate and friends.
 	["enablemap"] = true,                     -- reskin the map to fit tukui
 	["enablebag"] = true,                     -- enable an all in one bag mod that fit tukui perfectly
-	["totembardirection"] = "RIGHT",			-- set to LEFT or RIGHT
+--	["totembardirection"] = "RIGHT",			-- set to LEFT or RIGHT
 	["spincam"] = true,						-- spin camera while afk
 	["totembar_vh"] = true,               -- TotemBar vertical
 }

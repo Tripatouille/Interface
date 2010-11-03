@@ -317,13 +317,21 @@ AddOn_Loaded:SetScript("OnEvent", function(self, event, addon)
 
 	Mod_AddonSkins:RegisterSkin("Blizzard_TotemBar",function(Skin,skin,Layout,layout,config)
 		local bordercolors = {
-			{.23,.45,.13},    -- Earth
-			{.58,.23,.10},    -- Fire
+			{.58,.23,.10},    -- Earth
+			{.23,.45,.13},    -- Fire
 			{.19,.48,.60},   -- Water
 			{.42,.18,.74},   -- Air
 			{.39,.39,.12}    -- Summon / Recall
 		}
-		
+		local vert = nil
+		local flip = nil
+		if TukuiCF["actionbar"].totem_leftcorner then
+			vert = true
+			flip = false
+		else
+			vert = TukuiCF["actionbar"].verticalshapeshift
+			flip = TukuiCF["actionbar"].flipshapeshift
+		end
 		-- Skin Flyout
 		function Skin:SkinMCABFlyoutFrame(flyout)
 			flyout.top:SetTexture(nil)
@@ -341,14 +349,38 @@ AddOn_Loaded:SetScript("OnEvent", function(self, event, addon)
 				if not InCombatLockdown() then
 					button:SetSize(config.buttonSize,config.buttonSize)
 					button:ClearAllPoints()
-					button:SetPoint("LEFT",last,"RIGHT",config.borderWidth,0)
+					if vert then
+						if flip then
+							button:SetPoint("RIGHT", last, "LEFT", -config.borderWidth, 0)
+						else
+							button:SetPoint("LEFT", last, "RIGHT", config.borderWidth, 0)
+						end
+					else
+						if flip then
+							button:SetPoint("TOP", last, "BOTTOM", 0, -config.borderWidth)
+						else
+							button:SetPoint("BOTTOM", last, "TOP", 0, config.borderWidth)
+						end
+					end
 				end
 				if button:IsVisible() then last = button end
 			end
 			
 			--flyout.buttons[1]:SetPoint("RIGHT",flyout,"RIGHT")
 			flyout.buttons[1]:ClearAllPoints()
-			flyout.buttons[1]:SetPoint("LEFT",flyout.parent,"RIGHT", TukuiDB.Scale(1), 0)
+			if vert then
+				if flip then
+					flyout.buttons[1]:SetPoint("RIGHT",flyout.parent,"LEFT", TukuiDB.Scale(-1), 0)
+				else
+					flyout.buttons[1]:SetPoint("LEFT",flyout.parent,"RIGHT", TukuiDB.Scale(1), 0)
+				end
+			else
+				if flip then
+					flyout.buttons[1]:SetPoint("TOP",flyout.parent,"BOTTOM", 0, TukuiDB.Scale(-1))
+				else
+					flyout.buttons[1]:SetPoint("BOTTOM",flyout.parent,"TOP", 0, TukuiDB.Scale(1))
+				end
+			end
 			if flyout.type == "slot" then
 				local tcoords = SLOT_EMPTY_TCOORDS[flyout.parent:GetID()]
 				flyout.buttons[1].icon:SetTexCoord(tcoords.left,tcoords.right,tcoords.top,tcoords.bottom)
@@ -357,21 +389,48 @@ AddOn_Loaded:SetScript("OnEvent", function(self, event, addon)
 			local close = MultiCastFlyoutFrameCloseButton
 			self:SkinButton(close)
 			close:SetBackdropBorderColor(select(2, flyout:GetPoint()):GetBackdropBorderColor())
-			
 			close:GetHighlightTexture():SetTexture([[Interface\Buttons\ButtonHilight-Square]])
 			close:GetHighlightTexture():SetPoint("TOPLEFT",close,"TOPLEFT",config.borderWidth,-config.borderWidth)
 			close:GetHighlightTexture():SetPoint("BOTTOMRIGHT",close,"BOTTOMRIGHT",-config.borderWidth,config.borderWidth)
 			close:GetNormalTexture():SetTexture(nil)
 			close:ClearAllPoints()
-			close:SetPoint("LEFT",last,"RIGHT", TukuiDB.Scale(1), 0)
+			if vert then
+				if flip then
+					close:SetPoint("RIGHT",last,"LEFT", TukuiDB.Scale(-1), 0)
+				else
+					close:SetPoint("LEFT",last,"RIGHT", TukuiDB.Scale(1), 0)
+				end
+				close:SetWidth(config.buttonSpacing*2)
+				close:SetHeight(config.buttonSize)
+			else
+				if flip then
+					close:SetPoint("TOP",last,"BOTTOM", 0, TukuiDB.Scale(-1))
+				else
+					close:SetPoint("BOTTOM",last,"TOP", 0, TukuiDB.Scale(1))
+				end
+				close:SetHeight(config.buttonSpacing*2)
+				close:SetWidth(config.buttonSize)
+			end
 			--close:SetPoint("BOTTOMRIGHT",last,"TOPRIGHT",0,config.buttonSpacing)
-			close:SetWidth(config.buttonSpacing*2)
-			close:SetHeight(config.buttonSize)
+			
 			
 			flyout:ClearAllPoints()
+			if vert then
+				if flip then
+					flyout:SetPoint("RIGHT",flyout.parent,"LEFT",config.buttonSize,0)
+				else
+					flyout:SetPoint("LEFT",flyout.parent,"RIGHT",-config.buttonSize,0)
+				end
+			else
+				if flip then
+					flyout:SetPoint("TOP",flyout.parent,"BOTTOM", 0, config.buttonSize)
+				else
+					flyout:SetPoint("BOTTOM",flyout.parent,"TOP", 0, -config.buttonSize)
+				end
+			end
 			-- if TukuiCF["others"].totembardirection == "RIGHT" and TukuiCF["actionbar"].verticalshapeshift then
 				--print(flyout.parent:GetName())
-			flyout:SetPoint("LEFT",flyout.parent,"RIGHT",-config.buttonSize,0)
+				-- flyout:SetPoint("LEFT",flyout.parent,"RIGHT",-config.buttonSize,0)
 				--flyout:SetPoint("BOTTOMLEFT",flyout,"BOTTOMRIGHT",0,config.buttonSpacing)
 			-- elseif TukuiCF["others"].totembardirection == "RIGHT" and not TukuiCF["others"].verticalshapeshift then
 			   -- flyout:SetPoint("BOTTOM",flyout.parent,"TOP",config.buttonSpacing,0)
@@ -386,18 +445,29 @@ AddOn_Loaded:SetScript("OnEvent", function(self, event, addon)
 		function Skin:SkinMCABFlyoutOpenButton(button, parent)
 			button:GetHighlightTexture():SetTexture(nil)
 			button:GetNormalTexture():SetTexture(nil)
-			--print(button:GetParent():GetName())
-			if TukuiCF["others"].verticalshapeshift then
+			button:ClearAllPoints()
+			if vert then
 				-- Flyout Vertical
+				if flip then
+					button:SetPoint("RIGHT", parent, "LEFT", config.ButtonSpacing, 0)
+				else
+					button:SetPoint("LEFT", parent, "RIGHT", config.ButtonSpacing, 0)
+				end
 				button:SetWidth(config.buttonSpacing*3)
+				button:SetHeight(config.buttonSize)
 			else
 				-- Flyout Horizontal
+				if flip then
+					button:SetPoint("TOP", parent, "BOTTOM", 0, config.ButtonSpacing)
+				else
+					button:SetPoint("BOTTOM", parent, "TOP", 0, config.ButtonSpacing)
+				end
 				button:SetHeight(config.buttonSpacing*3)
+				button:SetWidth(config.buttonSize)
 			end
-			--button:SetHeight(config.buttonSpacing*3)
-			button:ClearAllPoints()
+
 			-- if TukuiCF["others"].totembardirection == "RIGHT"  and TukuiCF["others"].verticalshapeshift then
-			button:SetPoint("LEFT", parent, "RIGHT", config.ButtonSpacing, 0)
+				-- button:SetPoint("LEFT", parent, "RIGHT", config.ButtonSpacing, 0)
 				--button:SetPoint("BOTTOMLEFT", parent, "BOTTOMRIGHT")
 			-- elseif TukuiCF["others"].totembardirection == "RIGHT" and not TukuiCF["others"].verticalshapeshift then
 				-- button:SetPoint("TOPLEFT", parent, "TOPRIGHT")
@@ -414,9 +484,23 @@ AddOn_Loaded:SetScript("OnEvent", function(self, event, addon)
 			--button:SetBackdropBorderColor(parent:GetBackdropBorderColor())
 			if not button.visibleBut then
 				button.visibleBut = CreateFrame("Frame",nil,button)
-				button.visibleBut:SetHeight(config.buttonSize)
-				button.visibleBut:SetWidth(config.buttonSpacing*2)
-				button.visibleBut:SetPoint("LEFT", TukuiDB.Scale(1), 0)
+				if vert then
+					if flip then
+						button.visibleBut:SetPoint("RIGHT", TukuiDB.Scale(-1), 0)
+					else
+						button.visibleBut:SetPoint("LEFT", TukuiDB.Scale(1), 0)
+					end
+					button.visibleBut:SetHeight(config.buttonSize)
+					button.visibleBut:SetWidth(config.buttonSpacing*2)
+				else
+					if flip then
+						button.visibleBut:SetPoint("TOP", 0, TukuiDB.Scale(-1))
+					else
+						button.visibleBut:SetPoint("BOTTOM", 0, TukuiDB.Scale(1))
+					end
+					button.visibleBut:SetHeight(config.buttonSpacing*2)
+					button.visibleBut:SetWidth(config.buttonSize)
+				end
 				button.visibleBut.highlight = button.visibleBut:CreateTexture(nil,"HIGHLIGHT")
 				button.visibleBut.highlight:SetTexture([[Interface\Buttons\ButtonHilight-Square]])
 				-- if TukuiCF["others"].totembardirection == "RIGHT" then
